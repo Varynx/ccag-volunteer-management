@@ -1,6 +1,8 @@
-import { Admin, Resource } from "react-admin";
+import { Admin, defaultTheme, Resource } from "react-admin";
 import { dataProvider } from "./dataProvider";
 import { VolunteerList, VolunteerCreate } from "./volunteers";
+import { createTheme } from "@mui/material";
+
 
 const Dashboard = () => <h1>App is working 🚀</h1>;
 
