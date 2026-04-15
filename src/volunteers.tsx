@@ -9,6 +9,7 @@ import {
   TextInput,
   DateInput,
   NumberInput,
+  SelectInput,
 } from "react-admin";
 
 export const VolunteerList = () => (
@@ -53,21 +54,45 @@ export const VolunteerCreate = () => (
 
       <DateInput source="birthdate" />
 
-      <TextInput source="reliable_transportation" />
-      <TextInput source="background_check_completed" />
-      <TextInput source="excel_familiarity" />
+      <SelectInput source = "reliable_transportation" choices={[
+        { id: 'transport_yes', name: "Yes"},
+        { id: 'transport_no', name: "No" }
+      ]} />
+      <SelectInput source="background_check_completed" choices={[
+        { id: 'background_yes', name: 'Yes'},
+        { id: 'background_no', name: 'No'}
+      ]}/>
+      <SelectInput source="excel_familiarity" choices={[
+        { id: 'excel_lot', name: 'I know a lot'},
+        { id: 'excel_some', name: 'I know some'},
+        { id: 'excel_nothing', name: 'I know nothing'}
+      ]}/>
 
       <NumberInput source="weekly_hours_available" />
 
-      <TextInput source="one_time_or_ongoing" />
-      <TextInput source="physical_activity" />
+      <SelectInput source="one_time_or_ongoing" choices={[
+        { id: 'available_onetime', name: 'One-time events'},
+        { id: 'available_ongoing', name: 'Ongoing roles'}
+      ]}/>
+      <SelectInput source="physical_activity" choices={[
+        { id: 'physical_yes', name: 'Yes'},
+        { id: 'physical_no', name: 'No'},
+        { id: 'physical_depends', name:'Depends on the work'}
+      ]}/>
 
       <NumberInput source="hours_needed" />
 
-      <TextInput source="student_classification" />
+      <SelectInput source="student_classification" choices={[
+        { id: 'classification_freshman', name: 'Freshman'},
+        { id: 'classification_sophomore', name: 'Sophomore'},
+        { id: 'classification_junior', name: 'Junior'},
+        { id: 'classification_senior', name: 'Senior'}
+      ]}/>
       <TextInput source="city" />
 
       <TextInput source="notes" />
     </SimpleForm>
   </Create>
 );
+
+
