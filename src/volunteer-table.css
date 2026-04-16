@@ -1,0 +1,162 @@
+/* ─── Shared volunteer table styles ─────────────────────────────────
+   Colors pulled from the sample-ui-template's Tailwind config:
+     surface-container-lowest : #ffffff
+     surface-container-low    : #f0f4f7
+     surface-dim              : #cfdce3  (header bg)
+     primary-fixed            : #dae2fd  (hover highlight)
+     on-surface               : #2a3439  (body text)
+     on-surface-variant       : #566166  (secondary text / header labels)
+     outline-variant          : #a9b4b9
+──────────────────────────────────────────────────────────────────── */
+
+/* Outer card */
+.vt-container {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(169, 180, 185, 0.2);
+}
+
+/* Toolbar strip above the table */
+.vt-toolbar {
+  padding: 12px 16px;
+  background: #f0f4f7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(169, 180, 185, 0.15);
+}
+
+.vt-toolbar-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+  color: #2a3439;
+  letter-spacing: -0.02em;
+}
+
+.vt-toolbar-sub {
+  font-size: 11px;
+  color: #566166;
+  margin: 2px 0 0;
+}
+
+/* Scrollable table wrapper */
+.vt-scroll {
+  overflow-x: auto;
+}
+
+/* Table base */
+.vt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+}
+
+/* Header row */
+.vt-thead {
+  background: #cfdce3;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.vt-th {
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #566166;
+  white-space: nowrap;
+  border-bottom: 1px solid rgba(169, 180, 185, 0.25);
+}
+
+.vt-th-actions {
+  text-align: right;
+  width: 68px;
+}
+
+/* Data rows — alternating stripes */
+.vt-row-even { background: #ffffff; }
+.vt-row-odd  { background: #f0f4f7; }
+
+.vt-row {
+  transition: background-color 0.12s ease;
+}
+.vt-row:hover {
+  background: #dae2fd !important;
+}
+
+/* Hide action buttons; reveal on row hover */
+.vt-row .vt-actions { opacity: 0; }
+.vt-row:hover .vt-actions { opacity: 1; }
+
+/* Data cell */
+.vt-td {
+  padding: 3px 8px;
+  color: #2a3439;
+  border-bottom: 1px solid rgba(207, 220, 227, 0.4);
+  vertical-align: middle;
+  /* Keep columns from growing too wide by default */
+  max-width: 180px;
+}
+
+/* ─── Expand / collapse cell text ───────────────────────────────────
+   Every cell's inner <span> gets one of these classes.
+   Clicking it toggles between truncated and expanded.
+──────────────────────────────────────────────────────────────────── */
+.vt-cell-truncated {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  /* Faint underline hint that it is clickable */
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(86, 94, 116, 0.4);
+}
+
+.vt-cell-expanded {
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+  cursor: pointer;
+  max-width: 340px;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(86, 94, 116, 0.4);
+}
+
+/* Non-expandable plain cell text */
+.vt-cell-plain {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Action icon buttons */
+.vt-actions {
+  display: flex;
+  gap: 2px;
+  justify-content: flex-end;
+  transition: opacity 0.12s ease;
+}
+
+/* Status / empty message */
+.vt-status {
+  padding: 16px;
+  font-size: 12px;
+  color: #566166;
+}
+
+.vt-error {
+  padding: 16px;
+  font-size: 12px;
+  color: #9f403d;
+}
