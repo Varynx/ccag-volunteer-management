@@ -1,5 +1,6 @@
 import { Admin, Resource } from "react-admin";
 import { dataProvider } from "./dataProvider";
+import { authProvider } from "./authProvider";
 import { VolunteerList } from "./volunteers";
 import { VolunteerInfoList } from "./volunteer_information";
 
@@ -7,7 +8,7 @@ const Dashboard = () => <h1>App is working 🚀</h1>;
 
 function App() {
   return (
-    <Admin dataProvider={dataProvider} dashboard={Dashboard}>
+    <Admin dataProvider={dataProvider} authProvider={authProvider} dashboard={Dashboard}>
       {/*
        * Each <Resource> creates one sidebar tab.
        *   name    – must exactly match the Supabase table / view name
