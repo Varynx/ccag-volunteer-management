@@ -85,7 +85,7 @@ const COLS: ColDef[] = [
   { label: "Name",                key: "name"                },
   { label: "Email",               key: "email"               },
   { label: "Phone",               key: "phone_number"        },
-  { label: "Volunteer Attributes",key: "volunteer_attributes"},
+  { label: "BG Check / Transportation / Excel",key: "volunteer_attributes"},
   { label: "Areas of Interest",   key: "areas_of_interest"   },
   { label: "Availability",        key: "availability"        },
   { label: "Hrs Needed",          key: "hours_needed"        },

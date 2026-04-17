@@ -283,14 +283,16 @@ export const VolunteerList = () => {
 
   // ── Create modal — junction table selections ───────────────────────────────
   //
-  // selectedInterests  : number[]        — interest_id values checked by user
-  // selectedAvailability : Set<string>   — keys like "3-2" = day_id 3, slot_id 2
-  // selectedSourceId   : number | null   — chosen referral_source.id
-  // customValue        : string          — free-text for volunteer_referral.custom_value
-  const [selectedInterests,    setSelectedInterests]    = useState<number[]>([]);
-  const [selectedAvailability, setSelectedAvailability] = useState<Set<string>>(new Set());
-  const [selectedSourceId,     setSelectedSourceId]     = useState<number | null>(null);
-  const [customValue,          setCustomValue]          = useState("");
+  // selectedInterests : number[]      — interest_id values checked by user
+  // selectedDays      : Set<number>   — day_id values checked by user
+  // selectedSlots     : Set<number>   — slot_id values checked by user
+  // selectedSourceId  : number | null — chosen referral_source.id
+  // customValue       : string        — free-text for volunteer_referral.custom_value
+  const [selectedInterests, setSelectedInterests] = useState<number[]>([]);
+  const [selectedDays,      setSelectedDays]      = useState<Set<number>>(new Set());
+  const [selectedSlots,     setSelectedSlots]     = useState<Set<number>>(new Set());
+  const [selectedSourceId,  setSelectedSourceId]  = useState<number | null>(null);
+  const [customValue,       setCustomValue]        = useState("");
 
   // ── Fetch: main volunteer rows ─────────────────────────────────────────────
   const fetchAll = useCallback(async () => {
@@ -330,21 +332,18 @@ export const VolunteerList = () => {
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
 
-  // Availability key = "<day_id>-<slot_id>"  e.g. "2-3"
-  const toggleAvailability = (dayId: number, slotId: number) => {
-    const key = `${dayId}-${slotId}`;
-    setSelectedAvailability(prev => {
-      const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
-      return next;
-    });
-  };
+  const toggleDay = (id: number) =>
+    setSelectedDays(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  const toggleSlot = (id: number) =>
+    setSelectedSlots(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   // Resets all create-modal state back to defaults
   const resetCreate = () => {
     setCreateForm({ ...EMPTY_CORE });
     setSelectedInterests([]);
-    setSelectedAvailability(new Set());
+    setSelectedDays(new Set());
+    setSelectedSlots(new Set());
     setSelectedSourceId(null);
     setCustomValue("");
     setCreateOpen(false);
@@ -433,14 +432,16 @@ export const VolunteerList = () => {
       if (e2) partialErrors.push("Interests: " + e2.message);
     }
 
-    // ── Step 3: Insert availability grid selections ───────────────────────────
-    // Each checked cell in the day × slot grid becomes one row.
-    // The key format "dayId-slotId" is split and parsed back to numbers.
-    if (selectedAvailability.size > 0) {
-      const pairs = Array.from(selectedAvailability).map(key => {
-        const [day_id, slot_id] = key.split("-").map(Number);
-        return { volunteer_id: volunteerId, day_id, slot_id };
-      });
+    // ── Step 3: Insert availability — cross product of selected days × slots ──
+    // Days and slots are stored independently in the UI. All combinations are
+    // inserted so the existing (volunteer_id, day_id, slot_id) schema is preserved.
+    if (selectedDays.size > 0 && selectedSlots.size > 0) {
+      const pairs: { volunteer_id: string; day_id: number; slot_id: number }[] = [];
+      selectedDays.forEach(day_id =>
+        selectedSlots.forEach(slot_id =>
+          pairs.push({ volunteer_id: volunteerId, day_id, slot_id })
+        )
+      );
       const { error: e3 } = await supabase
         .from("volunteer_availability")
         .insert(pairs);
@@ -650,7 +651,7 @@ export const VolunteerList = () => {
                     />
                   }
                   label={
-                    <span style={{ fontSize: 12, color: "#2a3439" }}>
+                    <span style={{ fontSize: 12, color: "inherit" }}>
                       {interest.interest_name}
                     </span>
                   }
@@ -673,64 +674,56 @@ export const VolunteerList = () => {
            * { volunteer_id, day_id, slot_id } for the batch INSERT.
            * ─────────────────────────────────────────────────────────────────── */}
           <SectionLabel>Availability — check all that apply</SectionLabel>
-          {/*
-           * CSS Grid replaces a plain <table> here.
-           * MUI's emotion CSS baseline resets plain HTML table elements inside
-           * a flex Dialog, collapsing them to zero height. Divs are unaffected.
-           *
-           * gridTemplateColumns: first col = day label (120px fixed),
-           * remaining cols = one equal fraction per time slot.
-           */}
-          {/* flexShrink: 0 prevents the flex DialogContent from crushing this
-              div to height: 0. overflowX is not needed — CSS Grid 1fr columns
-              adapt to the available width automatically. */}
-          <div style={{ flexShrink: 0 }}>
-            {/* Header row */}
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: `120px repeat(${SLOTS.length}, 1fr)`,
-              borderBottom: "1px solid #e8eff3",
-              marginBottom: 2,
-            }}>
-              <div style={{ padding: "4px 8px", fontSize: 9, fontWeight: 700,
-                            textTransform: "uppercase", letterSpacing: "0.08em",
-                            color: "#566166" }}>
-                Day / Time
-              </div>
-              {SLOTS.map(slot => (
-                <div key={slot.id} style={{ padding: "4px 8px", fontSize: 9, fontWeight: 700,
-                                            textTransform: "uppercase", letterSpacing: "0.08em",
-                                            color: "#566166", textAlign: "center",
-                                            whiteSpace: "nowrap" }}>
-                  {slot.slot_name}
-                </div>
-              ))}
+          <div style={{ display: "flex", gap: 24, flexShrink: 0 }}>
+            {/* Days column */}
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                          letterSpacing: "0.08em", color: "inherit", margin: "0 0 4px" }}>
+                Days
+              </p>
+              <FormGroup>
+                {DAYS.map(day => (
+                  <FormControlLabel
+                    key={day.id}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={selectedDays.has(day.id)}
+                        onChange={() => toggleDay(day.id)}
+                        sx={{ color: "#a9b4b9", "&.Mui-checked": { color: "#565e74" }, p: "3px" }}
+                      />
+                    }
+                    label={<span style={{ fontSize: 12, color: "inherit" }}>{day.day_of_week}</span>}
+                    sx={{ mr: 0, mb: 0 }}
+                  />
+                ))}
+              </FormGroup>
             </div>
 
-            {/* One row per day */}
-            {DAYS.map((day, rowIdx) => (
-              <div key={day.id} style={{
-                display: "grid",
-                gridTemplateColumns: `120px repeat(${SLOTS.length}, 1fr)`,
-                background: rowIdx % 2 === 0 ? "#ffffff" : "#f7f9fb",
-                alignItems: "center",
-              }}>
-                <div style={{ padding: "2px 8px", fontWeight: 600, fontSize: 12,
-                              color: "#2a3439", whiteSpace: "nowrap" }}>
-                  {day.day_of_week}
-                </div>
+            {/* Times column */}
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                          letterSpacing: "0.08em", color: "inherit", margin: "0 0 4px" }}>
+                Times
+              </p>
+              <FormGroup>
                 {SLOTS.map(slot => (
-                  <div key={slot.id} style={{ display: "flex", justifyContent: "center" }}>
-                    <Checkbox
-                      size="small"
-                      checked={selectedAvailability.has(`${day.id}-${slot.id}`)}
-                      onChange={() => toggleAvailability(day.id, slot.id)}
-                      sx={{ color: "#a9b4b9", "&.Mui-checked": { color: "#565e74" }, p: "3px" }}
-                    />
-                  </div>
+                  <FormControlLabel
+                    key={slot.id}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={selectedSlots.has(slot.id)}
+                        onChange={() => toggleSlot(slot.id)}
+                        sx={{ color: "#a9b4b9", "&.Mui-checked": { color: "#565e74" }, p: "3px" }}
+                      />
+                    }
+                    label={<span style={{ fontSize: 12, color: "inherit" }}>{slot.slot_name}</span>}
+                    sx={{ mr: 0, mb: 0 }}
+                  />
                 ))}
-              </div>
-            ))}
+              </FormGroup>
+            </div>
           </div>
 
           {/* ── Section 4: Referral Source ────────────────────────────────────
@@ -753,7 +746,7 @@ export const VolunteerList = () => {
           ) : (
             <>
               <FormControl>
-                <FormLabel sx={{ fontSize: 11, color: "#566166", mb: 0.5 }}>
+                <FormLabel sx={{ fontSize: 11, mb: 0.5 }}>
                   Select a source (optional)
                 </FormLabel>
                 <RadioGroup
@@ -773,7 +766,7 @@ export const VolunteerList = () => {
                         />
                       }
                       label={
-                        <span style={{ fontSize: 12, color: "#2a3439" }}>
+                        <span style={{ fontSize: 12, color: "inherit" }}>
                           {source.source_name}
                         </span>
                       }
