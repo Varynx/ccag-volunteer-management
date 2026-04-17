@@ -7,4 +7,9 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession:   true,  // keeps session across tabs and page reloads
+    autoRefreshToken: true,  // silently refreshes the JWT before it expires
+  },
+});
