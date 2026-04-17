@@ -651,7 +651,7 @@ export const VolunteerList = () => {
                     />
                   }
                   label={
-                    <span style={{ fontSize: 12, color: "#2a3439" }}>
+                    <span style={{ fontSize: 12, color: "inherit" }}>
                       {interest.interest_name}
                     </span>
                   }
@@ -678,7 +678,7 @@ export const VolunteerList = () => {
             {/* Days column */}
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
-                          letterSpacing: "0.08em", color: "#566166", margin: "0 0 4px" }}>
+                          letterSpacing: "0.08em", color: "inherit", margin: "0 0 4px" }}>
                 Days
               </p>
               <FormGroup>
@@ -693,7 +693,7 @@ export const VolunteerList = () => {
                         sx={{ color: "#a9b4b9", "&.Mui-checked": { color: "#565e74" }, p: "3px" }}
                       />
                     }
-                    label={<span style={{ fontSize: 12, color: "#2a3439" }}>{day.day_of_week}</span>}
+                    label={<span style={{ fontSize: 12, color: "inherit" }}>{day.day_of_week}</span>}
                     sx={{ mr: 0, mb: 0 }}
                   />
                 ))}
@@ -703,7 +703,7 @@ export const VolunteerList = () => {
             {/* Times column */}
             <div>
               <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
-                          letterSpacing: "0.08em", color: "#566166", margin: "0 0 4px" }}>
+                          letterSpacing: "0.08em", color: "inherit", margin: "0 0 4px" }}>
                 Times
               </p>
               <FormGroup>
@@ -718,7 +718,7 @@ export const VolunteerList = () => {
                         sx={{ color: "#a9b4b9", "&.Mui-checked": { color: "#565e74" }, p: "3px" }}
                       />
                     }
-                    label={<span style={{ fontSize: 12, color: "#2a3439" }}>{slot.slot_name}</span>}
+                    label={<span style={{ fontSize: 12, color: "inherit" }}>{slot.slot_name}</span>}
                     sx={{ mr: 0, mb: 0 }}
                   />
                 ))}
@@ -746,7 +746,7 @@ export const VolunteerList = () => {
           ) : (
             <>
               <FormControl>
-                <FormLabel sx={{ fontSize: 11, color: "#566166", mb: 0.5 }}>
+                <FormLabel sx={{ fontSize: 11, mb: 0.5 }}>
                   Select a source (optional)
                 </FormLabel>
                 <RadioGroup
@@ -766,7 +766,7 @@ export const VolunteerList = () => {
                         />
                       }
                       label={
-                        <span style={{ fontSize: 12, color: "#2a3439" }}>
+                        <span style={{ fontSize: 12, color: "inherit" }}>
                           {source.source_name}
                         </span>
                       }

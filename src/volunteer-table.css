@@ -1,164 +1,171 @@
-/* ─── Shared volunteer table styles ─────────────────────────────────
-   Colors pulled from the sample-ui-template's Tailwind config:
-     surface-container-lowest : #ffffff
-     surface-container-low    : #f0f4f7
-     surface-dim              : #cfdce3  (header bg)
-     primary-fixed            : #dae2fd  (hover highlight)
-     on-surface               : #2a3439  (body text)
-     on-surface-variant       : #566166  (secondary text / header labels)
-     outline-variant          : #a9b4b9
+/* ─── Shared volunteer table styles ──────────────────────────────────
+   Uses CSS custom properties so light/dark toggling is handled by
+   the body.dark-mode class applied by ThemeApplier in layout.tsx.
 ──────────────────────────────────────────────────────────────────── */
 
-/* Outer card */
-.vt-container {
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  border: 1px solid rgba(169, 180, 185, 0.2);
+/* Light mode defaults */
+:root {
+  --vt-card-bg:      #ffffff;
+  --vt-card-border:  rgba(169, 180, 185, 0.2);
+  --vt-card-shadow:  0 1px 3px rgba(0, 0, 0, 0.08);
+  --vt-toolbar-bg:   #f0f4f7;
+  --vt-toolbar-bdr:  rgba(169, 180, 185, 0.15);
+  --vt-title:        #2a3439;
+  --vt-sub:          #566166;
+  --vt-thead-bg:     #cfdce3;
+  --vt-th-color:     #566166;
+  --vt-th-border:    rgba(169, 180, 185, 0.25);
+  --vt-row-even:     #ffffff;
+  --vt-row-odd:      #f0f4f7;
+  --vt-row-hover:    #dae2fd;
+  --vt-cell-color:   #2a3439;
+  --vt-cell-border:  rgba(207, 220, 227, 0.4);
+  --vt-underline:    rgba(86, 94, 116, 0.4);
+  --vt-status:       #566166;
+  --vt-err:          #9f403d;
 }
 
-/* Toolbar strip above the table */
+/* Dark mode overrides */
+body.dark-mode {
+  --vt-card-bg:      #06122d;
+  --vt-card-border:  rgba(43, 70, 128, 0.2);
+  --vt-card-shadow:  0 1px 6px rgba(0, 0, 0, 0.4);
+  --vt-toolbar-bg:   #031d4b;
+  --vt-toolbar-bdr:  rgba(43, 70, 128, 0.25);
+  --vt-title:        #dee5ff;
+  --vt-sub:          #91aaeb;
+  --vt-thead-bg:     #000000;
+  --vt-th-color:     #91aaeb;
+  --vt-th-border:    rgba(43, 70, 128, 0.3);
+  --vt-row-even:     #06122d;
+  --vt-row-odd:      #05183c;
+  --vt-row-hover:    #002867;
+  --vt-cell-color:   #dee5ff;
+  --vt-cell-border:  rgba(43, 70, 128, 0.15);
+  --vt-underline:    rgba(145, 170, 235, 0.4);
+  --vt-status:       #91aaeb;
+  --vt-err:          #ee7d77;
+}
+
+/* ── Components ───────────────────────────────────────────────────── */
+
+.vt-container {
+  background:    var(--vt-card-bg);
+  border-radius: 12px;
+  box-shadow:    var(--vt-card-shadow);
+  overflow:      hidden;
+  border:        1px solid var(--vt-card-border);
+}
+
 .vt-toolbar {
-  padding: 12px 16px;
-  background: #f0f4f7;
-  display: flex;
+  padding:         12px 16px;
+  background:      var(--vt-toolbar-bg);
+  display:         flex;
   justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(169, 180, 185, 0.15);
+  align-items:     center;
+  border-bottom:   1px solid var(--vt-toolbar-bdr);
 }
 
 .vt-toolbar-title {
-  font-size: 18px;
-  font-weight: 800;
-  margin: 0;
-  color: #2a3439;
+  font-size:      18px;
+  font-weight:    800;
+  margin:         0;
+  color:          var(--vt-title);
   letter-spacing: -0.02em;
 }
 
 .vt-toolbar-sub {
   font-size: 11px;
-  color: #566166;
-  margin: 2px 0 0;
+  color:     var(--vt-sub);
+  margin:    2px 0 0;
 }
 
-/* Scrollable table wrapper */
-.vt-scroll {
-  overflow-x: auto;
-}
+.vt-scroll { overflow-x: auto; }
 
-/* Table base */
 .vt-table {
-  width: 100%;
+  width:           100%;
   border-collapse: collapse;
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
+  font-family:     'Inter', sans-serif;
+  font-size:       11px;
 }
 
-/* Header row */
 .vt-thead {
-  background: #cfdce3;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  background: var(--vt-thead-bg);
+  position:   sticky;
+  top:        0;
+  z-index:    1;
 }
 
 .vt-th {
-  padding: 6px 8px;
-  text-align: left;
-  font-size: 9px;
-  font-weight: 700;
+  padding:        6px 8px;
+  text-align:     left;
+  font-size:      9px;
+  font-weight:    700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #566166;
-  white-space: nowrap;
-  border-bottom: 1px solid rgba(169, 180, 185, 0.25);
+  color:          var(--vt-th-color);
+  white-space:    nowrap;
+  border-bottom:  1px solid var(--vt-th-border);
 }
 
-.vt-th-actions {
-  text-align: right;
-  width: 68px;
-}
+.vt-th-actions { text-align: right; width: 68px; }
 
-/* Data rows — alternating stripes */
-.vt-row-even { background: #ffffff; }
-.vt-row-odd  { background: #f0f4f7; }
+.vt-row-even { background: var(--vt-row-even); }
+.vt-row-odd  { background: var(--vt-row-odd);  }
 
-.vt-row {
-  transition: background-color 0.12s ease;
-}
-.vt-row:hover {
-  background: #dae2fd !important;
-}
+.vt-row { transition: background-color 0.12s ease; }
+.vt-row:hover { background: var(--vt-row-hover) !important; }
 
-/* Hide action buttons; reveal on row hover */
-.vt-row .vt-actions { opacity: 0; }
+.vt-row .vt-actions       { opacity: 0; }
 .vt-row:hover .vt-actions { opacity: 1; }
 
-/* Data cell */
 .vt-td {
-  padding: 3px 8px;
-  height: 28px;
-  color: #2a3439;
-  border-bottom: 1px solid rgba(207, 220, 227, 0.4);
+  padding:        3px 8px;
+  height:         28px;
+  color:          var(--vt-cell-color);
+  border-bottom:  1px solid var(--vt-cell-border);
   vertical-align: middle;
-  max-width: 180px;
-  overflow: hidden;
+  max-width:      180px;
+  overflow:       hidden;
 }
 
-/* ─── Expand / collapse cell text ───────────────────────────────────
-   Every cell's inner <span> gets one of these classes.
-   Clicking it toggles between truncated and expanded.
-──────────────────────────────────────────────────────────────────── */
 .vt-cell-truncated {
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  line-height: 22px;
-  cursor: pointer;
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: rgba(86, 94, 116, 0.4);
+  display:                block;
+  overflow:               hidden;
+  white-space:            nowrap;
+  text-overflow:          ellipsis;
+  line-height:            22px;
+  cursor:                 pointer;
+  text-decoration-line:   underline;
+  text-decoration-style:  dotted;
+  text-decoration-color:  var(--vt-underline);
 }
 
 .vt-cell-expanded {
-  display: block;
-  white-space: normal;
-  word-break: break-word;
-  cursor: pointer;
-  max-width: 340px;
-  text-decoration-line: underline;
+  display:               block;
+  white-space:           normal;
+  word-break:            break-word;
+  cursor:                pointer;
+  max-width:             340px;
+  text-decoration-line:  underline;
   text-decoration-style: dotted;
-  text-decoration-color: rgba(86, 94, 116, 0.4);
+  text-decoration-color: var(--vt-underline);
 }
 
-/* Non-expandable plain cell text */
 .vt-cell-plain {
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
+  display:       block;
+  overflow:      hidden;
+  white-space:   nowrap;
   text-overflow: ellipsis;
-  line-height: 22px;
+  line-height:   22px;
 }
 
-/* Action icon buttons */
 .vt-actions {
-  display: flex;
-  gap: 2px;
+  display:         flex;
+  gap:             2px;
   justify-content: flex-end;
-  transition: opacity 0.12s ease;
+  transition:      opacity 0.12s ease;
 }
 
-/* Status / empty message */
-.vt-status {
-  padding: 16px;
-  font-size: 12px;
-  color: #566166;
-}
-
-.vt-error {
-  padding: 16px;
-  font-size: 12px;
-  color: #9f403d;
-}
+.vt-status { padding: 16px; font-size: 12px; color: var(--vt-status); }
+.vt-error  { padding: 16px; font-size: 12px; color: var(--vt-err);    }
