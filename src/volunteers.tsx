@@ -268,9 +268,11 @@ export const VolunteerList = () => {
   const toggleExpand  = (k: string) => setExpandedKey(p => p === k ? null : k);
 
   // ── Edit modal ─────────────────────────────────────────────────────────────
-  const [editRow,  setEditRow]  = useState<Volunteer | null>(null);
-  const [editForm, setEditForm] = useState<Partial<Volunteer>>({});
-  const [saving,   setSaving]   = useState(false);
+  const [editRow,   setEditRow]   = useState<Volunteer | null>(null);
+  const [editForm,  setEditForm]  = useState<Partial<Volunteer>>({});
+  const [saving,    setSaving]    = useState(false);
+  const [editDays,  setEditDays]  = useState<Set<number>>(new Set());
+  const [editSlots, setEditSlots] = useState<Set<number>>(new Set());
 
   // ── Delete modal ───────────────────────────────────────────────────────────
   const [deleteRow, setDeleteRow] = useState<Volunteer | null>(null);
@@ -350,8 +352,30 @@ export const VolunteerList = () => {
   };
 
   // ── Edit handlers ──────────────────────────────────────────────────────────
-  const openEdit  = (row: Volunteer) => { setEditRow(row); setEditForm({ ...row }); };
-  const closeEdit = () => { setEditRow(null); setEditForm({}); };
+  const openEdit = async (row: Volunteer) => {
+    setEditRow(row);
+    setEditForm({ ...row });
+    // Load existing availability for this volunteer
+    const { data } = await supabase
+      .from("volunteer_availability")
+      .select("day_id, slot_id")
+      .eq("volunteer_id", row.id);
+    const days  = new Set<number>();
+    const slots = new Set<number>();
+    (data ?? []).forEach((r: { day_id: number; slot_id: number }) => {
+      days.add(r.day_id);
+      slots.add(r.slot_id);
+    });
+    setEditDays(days);
+    setEditSlots(slots);
+  };
+
+  const closeEdit = () => {
+    setEditRow(null);
+    setEditForm({});
+    setEditDays(new Set());
+    setEditSlots(new Set());
+  };
 
   const handleEditChange = (key: keyof Volunteer, val: string) =>
     setEditForm(prev => ({ ...prev, [key]: val }));
@@ -359,12 +383,34 @@ export const VolunteerList = () => {
   const handleSaveEdit = async () => {
     if (!editRow) return;
     setSaving(true);
-    const { error } = await supabase
+
+    // Update core volunteer fields
+    const { error: coreErr } = await supabase
       .from("volunteer")
       .update(editForm)
       .eq("id", editRow.id);
+    if (coreErr) { alert("Save failed: " + coreErr.message); setSaving(false); return; }
+
+    // Replace availability: delete existing rows then re-insert
+    const { error: delErr } = await supabase
+      .from("volunteer_availability")
+      .delete()
+      .eq("volunteer_id", editRow.id);
+    if (delErr) { alert("Availability delete failed: " + delErr.message); }
+    else if (editDays.size > 0 && editSlots.size > 0) {
+      const pairs: { volunteer_id: string; day_id: number; slot_id: number }[] = [];
+      editDays.forEach(day_id =>
+        editSlots.forEach(slot_id =>
+          pairs.push({ volunteer_id: editRow.id, day_id, slot_id })
+        )
+      );
+      const { error: insErr } = await supabase
+        .from("volunteer_availability")
+        .insert(pairs);
+      if (insErr) alert("Availability save failed: " + insErr.message);
+    }
+
     setSaving(false);
-    if (error) { alert("Save failed: " + error.message); return; }
     closeEdit();
     fetchAll();
   };
@@ -563,6 +609,67 @@ export const VolunteerList = () => {
           sx={{ display: "flex", flexDirection: "column", gap: 1.5, pt: "16px !important" }}
         >
           <VolunteerForm values={editForm} onChange={handleEditChange} />
+
+          <SectionLabel>Availability — check all that apply</SectionLabel>
+          <div style={{ display: "flex", gap: 24, flexShrink: 0 }}>
+            {/* Days column */}
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                          letterSpacing: "0.08em", color: "inherit", margin: "0 0 4px" }}>
+                Days
+              </p>
+              <FormGroup>
+                {DAYS.map(day => (
+                  <FormControlLabel
+                    key={day.id}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={editDays.has(day.id)}
+                        onChange={() => setEditDays(prev => {
+                          const n = new Set(prev);
+                          n.has(day.id) ? n.delete(day.id) : n.add(day.id);
+                          return n;
+                        })}
+                        sx={{ color: "#a9b4b9", "&.Mui-checked": { color: "#565e74" }, p: "3px" }}
+                      />
+                    }
+                    label={<span style={{ fontSize: 12, color: "inherit" }}>{day.day_of_week}</span>}
+                    sx={{ mr: 0, mb: 0 }}
+                  />
+                ))}
+              </FormGroup>
+            </div>
+
+            {/* Times column */}
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase",
+                          letterSpacing: "0.08em", color: "inherit", margin: "0 0 4px" }}>
+                Times
+              </p>
+              <FormGroup>
+                {SLOTS.map(slot => (
+                  <FormControlLabel
+                    key={slot.id}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={editSlots.has(slot.id)}
+                        onChange={() => setEditSlots(prev => {
+                          const n = new Set(prev);
+                          n.has(slot.id) ? n.delete(slot.id) : n.add(slot.id);
+                          return n;
+                        })}
+                        sx={{ color: "#a9b4b9", "&.Mui-checked": { color: "#565e74" }, p: "3px" }}
+                      />
+                    }
+                    label={<span style={{ fontSize: 12, color: "inherit" }}>{slot.slot_name}</span>}
+                    sx={{ mr: 0, mb: 0 }}
+                  />
+                ))}
+              </FormGroup>
+            </div>
+          </div>
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 1.5 }}>
           <Button onClick={closeEdit} sx={{ textTransform: "none", color: "#566166" }}>Cancel</Button>
