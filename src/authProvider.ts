@@ -15,8 +15,10 @@ export const authProvider: AuthProvider = {
   },
 
   checkAuth: async () => {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error || !user) throw new Error("Not authenticated");
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) throw new Error("Not authenticated");
   },
 
   checkError: async (error) => {
