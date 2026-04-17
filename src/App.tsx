@@ -1,7 +1,7 @@
 import { Admin, Resource } from "react-admin";
 import { dataProvider } from "./dataProvider";
 import { authProvider } from "./authProvider";
-import { Layout } from "./layout";
+import { Layout } from "./Layout";
 import { lightTheme, darkTheme } from "./theme";
 import { VolunteerList } from "./volunteers";
 import { VolunteerInfoList } from "./volunteer_information";
