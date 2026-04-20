@@ -1,15 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY as string;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error("Missing Supabase environment variables");
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
-    persistSession:   true,  // keeps session across tabs and page reloads
-    autoRefreshToken: true,  // silently refreshes the JWT before it expires
+    persistSession: false,      // no login saved after refresh
+    autoRefreshToken: false,    // no silent session renewal
   },
 });
